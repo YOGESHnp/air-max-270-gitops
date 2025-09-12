@@ -1,25 +1,23 @@
 # air-max-270-gitops
 
+# Technical Report — air-max-270 Observability Stack
+
+**Author:** Yogesh  
+**Date:** 12 Sep 2025  
+**Repos:**  
+- GitOps (K8s + Observability): https://github.com/YOGESHnp/air-max-270-gitops
+
+---
+
+**CD (Argo CD)**
+  - App-of-Apps boots the platform (ALB Controller, Loki stack, apps).
+  - Auto-sync with prune + self-heal ensures declarative drift correction.
+  - **Multi-env** via overlays:
+    - `dev`: `latest`, namePrefix `dev-`, dedicated Ingress rule.
+    - `staging`: `staging`, namePrefix `stg-`, dedicated Ingress rule (shared ALB).
+
 ### Trade-offs
 - **Simplicity vs. HA:** Single NAT/ALB is cost-efficient for demo; production should use **multi-AZ** NAT, ALB subnets, and multiple node groups.
 - **Speed vs. least privilege:** For the deadline, the ALB Controller IAM was attached to the **node role**. Production should migrate to **IRSA** with minimal policy.
 - **Storage:** Loki persistence disabled for quick bring-up (no EBS CSI). Production should **enable persistence** via the **EBS CSI driver** and a default `gp3` StorageClass.
 
-## Security Rationale
-
-- **AWS IAM**
-  - **GitHub OIDC** role for CI: push to ECR without long-lived keys.
-  - **Node role**: EC2/ECR read; temporary ELB policy attached for ALB controller.  
-    **Roadmap:** move controller to **IRSA** with the official minimal policy; detach broad policies from node role.
-  - **Cluster role**: EKS service/control-plane policies.
-- **Network**
-  - Nodes in **private subnets** (no public IPs); ALB in public subnets.
-  - Security groups restrict control plane traffic (443) and kubelet (10250) appropriately.
-- **Secrets**
-  - No plaintext secrets in Git; Grafana admin creds stored as K8s Secret from Helm.  
-  - **Roadmap:** External secrets via AWS Secrets Manager; Argo CD sops.
-- **Supply Chain**
-  - CI builds/pushes to **ECR**; Kustomize overlays pin tags per environment.  
-  - **Roadmap:** image signing/verification (Sigstore), admission policy (OPA/Gatekeeper/Kyverno).
-- **State**
-  - **Roadmap:** remote Terraform state in S3 with DynamoDB locking and encryption.
