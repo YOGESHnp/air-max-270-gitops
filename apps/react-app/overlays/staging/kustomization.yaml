@@ -19,4 +19,4 @@ patches:
 images:
   - name: public.ecr.aws/nginx/nginx
     newName: 376129860198.dkr.ecr.us-east-1.amazonaws.com/air-max-270/landing
-    newTag: staging
+    newTag: latest
