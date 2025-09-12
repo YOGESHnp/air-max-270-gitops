@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: aws-load-balancer-controller
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  source:
+    repoURL: https://aws.github.io/eks-charts
+    chart: aws-load-balancer-controller
+    targetRevision: 1.*
+    helm:
+      values: |
+        clusterName: air-max-270-dev-eks
+        region: us-east-1
+        vpcId: vpc-0d5b1ab44b9c05887
+        serviceAccount:
+          create: true
+          name: aws-load-balancer-controller
+          # (later, when you switch to IRSA)
+          # annotations:
+          #   eks.amazonaws.com/role-arn: arn:aws:iam::376129860198:role/eks-aws-lb-controller
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }

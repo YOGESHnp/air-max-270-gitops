@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: loki-stack
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  source:
+    repoURL: https://grafana.github.io/helm-charts
+    chart: loki-stack
+    targetRevision: 2.*
+    helm:
+      values: |
+        grafana:
+          enabled: true
+          adminPassword: "admin123"   # move to Secret/SM in prod
+          service:
+            type: NodePort
+        promtail:
+          enabled: true
+          config:
+            clients:
+              - url: http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push
+        loki:
+          persistence:
+            enabled: true
+            size: 10Gi
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: [CreateNamespace=true]
