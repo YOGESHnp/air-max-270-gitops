@@ -13,6 +13,7 @@ commonLabels:
 
 resources:
   - ../../base
+  - ingress.yaml
 patches:
   - path: patch-replicas.yaml
 
