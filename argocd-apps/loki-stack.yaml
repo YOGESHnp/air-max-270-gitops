@@ -28,5 +28,9 @@ spec:
           persistence:
             enabled: false
   syncPolicy:
-    automated: { prune: true, selfHeal: true }
-    syncOptions: [CreateNamespace=true]
+    automated: 
+      prune: true 
+      selfHeal: true 
+    syncOptions: 
+      - CreateNamespace=true
+      - Replace=true
