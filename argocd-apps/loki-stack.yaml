@@ -26,8 +26,7 @@ spec:
               - url: http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push
         loki:
           persistence:
-            enabled: true
-            size: 10Gi
+            enabled: false
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     syncOptions: [CreateNamespace=true]
